@@ -1,54 +1,314 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>i-harmonium</title>
     <style>
-        body { background: #2c1a12; color: #f4e4bc; font-family: serif; text-align: center; padding: 20px; cursor: pointer; }
-        .piano { display: flex; justify-content: center; margin: 40px; }
-        .key { border: 2px solid #f4e4bc; width: 60px; height: 200px; margin: 2px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-weight: bold; position: relative; border-radius: 0 0 5px 5px; }
-        .black { background: #1a100b; color: white; height: 120px; width: 40px; margin-left: -20px; margin-right: -20px; z-index: 2; border-color: #555; }
-        .active { background: #d4a373 !important; color: #2c1a12; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5); }
-        #bellows-meter { width: 400px; height: 12px; border: 1px solid #f4e4bc; margin: 20px auto; border-radius: 10px; overflow: hidden; }
-        #fill { width: 0%; height: 100%; background: #d4a373; transition: width 0.05s linear; }
-        #status-tip { font-style: italic; font-size: 0.9em; color: #8a7a6a; }
+        :root {
+            --maroon: #4a0f12;
+            --saffron: #e2a23a;
+            --jade: #1e6b5a;
+            --indigo: #1b1f3b;
+            --ivory: #f6e8c6;
+            --bronze: #a36f2b;
+            --rose: #d35b6f;
+            --teal: #0f7a7a;
+            --ink: #23150f;
+            --gold: #d6b15a;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ivory);
+            font-family: "Cinzel", "Garamond", "Palatino Linotype", serif;
+            text-align: center;
+            cursor: pointer;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(226, 162, 58, 0.22), transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(211, 91, 111, 0.25), transparent 45%),
+                radial-gradient(circle at 50% 80%, rgba(30, 107, 90, 0.25), transparent 50%),
+                linear-gradient(160deg, #2a0b0e 0%, #3b1219 35%, #1d0c12 100%);
+        }
+
+        .frame {
+            max-width: 1100px;
+            margin: 24px auto 48px;
+            padding: 28px 28px 36px;
+            border: 3px solid var(--gold);
+            background:
+                repeating-linear-gradient(45deg, rgba(214, 177, 90, 0.12) 0 8px, transparent 8px 16px),
+                linear-gradient(180deg, rgba(74, 15, 18, 0.9), rgba(35, 21, 15, 0.9));
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.45),
+                inset 0 0 0 2px rgba(246, 232, 198, 0.15);
+            border-radius: 18px;
+        }
+
+        h1 {
+            margin: 8px 0 6px;
+            font-size: 42px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6), 0 0 12px rgba(214, 177, 90, 0.4);
+        }
+
+        .subtitle {
+            margin: 0 0 14px;
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: #f3d79a;
+            text-transform: uppercase;
+        }
+
+        #status-tip {
+            font-style: italic;
+            font-size: 0.95em;
+            color: #f2d7a8;
+            margin-bottom: 18px;
+        }
+
+        .ornament {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 2px solid rgba(214, 177, 90, 0.6);
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(30, 107, 90, 0.25), rgba(226, 162, 58, 0.25));
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #bellows-meter {
+            width: min(520px, 86vw);
+            height: 16px;
+            border: 2px solid var(--gold);
+            margin: 18px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--saffron), var(--rose), var(--teal));
+            transition: width 0.05s linear;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.35);
+        }
+
+        #angle-display {
+            margin: 8px 0 20px;
+            font-size: 18px;
+            color: #f3d79a;
+        }
+
+        .piano {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4px;
+            margin: 32px auto 24px;
+            padding: 18px 16px 26px;
+            border-radius: 18px;
+            background:
+                linear-gradient(180deg, rgba(163, 111, 43, 0.35), rgba(35, 21, 15, 0.6)),
+                repeating-linear-gradient(90deg, rgba(246, 232, 198, 0.08) 0 8px, transparent 8px 16px);
+            border: 2px solid rgba(214, 177, 90, 0.55);
+            box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6);
+        }
+
+        .key {
+            border: 2px solid #f5e0b6;
+            width: 60px;
+            height: 220px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 12px;
+            font-weight: bold;
+            position: relative;
+            border-radius: 0 0 8px 8px;
+            background: linear-gradient(180deg, #f9efda, #e5c98d);
+            color: var(--ink);
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2), 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .black {
+            background: linear-gradient(180deg, #2b1a1c, #12090b);
+            color: #f5e0b6;
+            height: 130px;
+            width: 42px;
+            margin-left: -22px;
+            margin-right: -22px;
+            z-index: 2;
+            border-color: #3e2a2f;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7), 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .active {
+            background: linear-gradient(180deg, var(--saffron), var(--rose)) !important;
+            color: #2c1a12;
+            box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.5), 0 0 18px rgba(214, 177, 90, 0.5);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #f3d79a;
+            margin-top: 10px;
+        }
+
+        .legend span {
+            padding: 6px 10px;
+            border: 1px solid rgba(214, 177, 90, 0.5);
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        @media (max-width: 900px) {
+            .key {
+                width: 44px;
+                height: 200px;
+            }
+
+            .black {
+                width: 32px;
+                height: 120px;
+                margin-left: -16px;
+                margin-right: -16px;
+            }
+
+            h1 {
+                font-size: 34px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .frame {
+                margin: 10px;
+                padding: 18px;
+            }
+
+            .piano {
+                padding: 14px 10px 20px;
+            }
+
+            .key {
+                width: 34px;
+                height: 170px;
+                font-size: 12px;
+            }
+
+            .black {
+                width: 26px;
+                height: 100px;
+                margin-left: -13px;
+                margin-right: -13px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <h1>i-harmonium</h1>
-    <p id="status-tip">Click anywhere once to activate sound, then hold keys and <b>push lid down</b></p>
+    <div class="frame">
+        <div class="ornament">Kalakari Audio Cabinet</div>
+        <h1>i-harmonium</h1>
+        <div class="subtitle">Maximalist Indian Era Studio</div>
+        <p id="status-tip">Click anywhere once to activate sound, then hold keys and <b>push lid down</b> (Z/X for
+            octave)</p>
 
-    <div id="bellows-meter"><div id="fill"></div></div>
-    <h3 id="angle-display">Lid Angle: 0°</h3>
+        <div id="bellows-meter">
+            <div id="fill"></div>
+        </div>
+        <h3 id="angle-display">Lid Angle: 0°</h3>
 
-    <div class="piano">
-        <div id="key-a" class="key">C</div>
-        <div id="key-w" class="key black">C#</div>
-        <div id="key-s" class="key">D</div>
-        <div id="key-e" class="key black">D#</div>
+        <div class="piano">
+            <div id="key-a" class="key">C</div>
+            <div id="key-w" class="key black">C#</div>
+            <div id="key-s" class="key">D</div>
+            <div id="key-e" class="key black">D#</div>
         <div id="key-d" class="key">E</div>
         <div id="key-f" class="key">F</div>
         <div id="key-t" class="key black">F#</div>
-        <div id="key-g" class="key">G</div>
-        <div id="key-y" class="key black">G#</div>
-        <div id="key-h" class="key">A</div>
-        <div id="key-u" class="key black">A#</div>
-        <div id="key-j" class="key">B</div>
-        <div id="key-k" class="key">C</div>
+            <div id="key-g" class="key">G</div>
+            <div id="key-y" class="key black">G#</div>
+            <div id="key-h" class="key">A</div>
+            <div id="key-u" class="key black">A#</div>
+            <div id="key-j" class="key">B</div>
+            <div id="key-k" class="key">C</div>
+            <div id="key-o" class="key black">C#</div>
+            <div id="key-l" class="key">D</div>
+            <div id="key-p" class="key black">D#</div>
+            <div id="key-;" class="key">E</div>
+        </div>
+        <div class="legend">
+            <span>Keys: A W S E D F T G Y H U J K O L P ;</span>
+            <span>Octave: Z / X</span>
+            <span>Lid: Bellows Control</span>
+        </div>
     </div>
 
     <script>
-        const notes = {'a':261.63, 'w':277.18, 's':293.66, 'e':311.13, 'd':329.63, 'f':349.23, 't':369.99, 'g':392.00, 'y':415.30, 'h':440.00, 'u':466.16, 'j':493.88, 'k':523.25};
+        const baseFrequency = 130.81; // C3
+        const noteOffsets = {
+            'a': 0,  // C3
+            'w': 1,  // C#3
+            's': 2,  // D3
+            'e': 3,  // D#3
+            'd': 4,  // E3
+            'f': 5,  // F3
+            't': 6,  // F#3
+            'g': 7,  // G3
+            'y': 8,  // G#3
+            'h': 9,  // A3
+            'u': 10, // A#3
+            'j': 11, // B3
+            'k': 12, // C4
+            'o': 13, // C#4
+            'l': 14, // D4
+            'p': 15, // D#4
+            ';': 16  // E4
+        };
         let audioCtx, masterGain, bellows = 0, lastAngle = 0;
         let activeOscs = {};
+        let sampleBuffer = null;
+        let sampleFailed = false;
+        let octaveShift = 0;
+        let socketConnected = false;
+        let hasLidData = false;
+        let lastAngleAt = 0;
+        const minOctaveShift = -2;
+        const maxOctaveShift = 2;
 
         // Automatic initialization on first interaction
-        const initAudio = () => {
+        const initAudio = async () => {
             if (audioCtx) return;
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
             masterGain = audioCtx.createGain();
             masterGain.gain.value = 0;
             masterGain.connect(audioCtx.destination);
-            document.getElementById('status-tip').innerText = "Audio Active - Ready to play";
+            document.getElementById('status-tip').innerText = "Audio Active - Loading sample...";
+
+            try {
+                const res = await fetch('C3_Sample.mp3');
+                const arr = await res.arrayBuffer();
+                sampleBuffer = await audioCtx.decodeAudioData(arr);
+                document.getElementById('status-tip').innerText = "Audio Active - Sample Ready";
+            } catch (err) {
+                console.error("Sample load failed:", err);
+                sampleFailed = true;
+                if (location.protocol === 'file:') {
+                    document.getElementById('status-tip').innerText = "Audio Active - Sample Load Failed (run a local server)";
+                } else {
+                    document.getElementById('status-tip').innerText = "Audio Active - Sample Load Failed (fallback synth)";
+                }
+            }
         };
 
         window.addEventListener('mousedown', initAudio);
@@ -56,17 +316,33 @@
 
         // Connect to Python Bridge
         const socket = new WebSocket('ws://localhost:8765');
+        socket.onopen = () => {
+            socketConnected = true;
+            const tip = document.getElementById('status-tip');
+            if (tip && tip.innerText.includes("Sample")) {
+                tip.innerText = "Audio Active - Sample Ready (Lid connected)";
+            }
+        };
+        socket.onclose = () => {
+            socketConnected = false;
+            const tip = document.getElementById('status-tip');
+            if (tip && tip.innerText.includes("Sample")) {
+                tip.innerText = "Audio Active - Sample Ready (No lid data)";
+            }
+        };
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const angle = data.angle;
-            document.getElementById('angle-display').innerText = `Lid Angle: ${angle.toFixed(1)}°`;
-            
+            lastAngleAt = Date.now();
+            hasLidData = true;
+            document.getElementById('angle-display').innerText = `Lid Angle: ${angle.toFixed(1)}`;
+
             if (lastAngle !== 0) {
-                let change = lastAngle - angle; 
+                let change = lastAngle - angle;
                 if (change > 0.05) {
-                    bellows = Math.min(1.0, bellows + (change * 1.5)); 
+                    bellows = Math.min(1.0, bellows + (change * 1.5));
                 } else {
-                    bellows *= 0.98; 
+                    bellows *= 0.98;
                 }
             }
             lastAngle = angle;
@@ -74,43 +350,81 @@
 
         // Natural air decay
         setInterval(() => {
-            bellows *= 0.95; 
+            bellows *= 0.95;
             document.getElementById('fill').style.width = (bellows * 100) + "%";
             if (masterGain) masterGain.gain.setTargetAtTime(bellows, audioCtx.currentTime, 0.05);
         }, 50);
 
         window.onkeydown = (e) => {
             const key = e.key.toLowerCase();
-            if (notes[key] && !activeOscs[key] && audioCtx) {
-                const osc1 = audioCtx.createOscillator();
-                const osc2 = audioCtx.createOscillator();
-                osc1.type = 'sawtooth';
-                osc2.type = 'square';
-                osc1.frequency.value = notes[key];
-                osc2.frequency.value = notes[key] + 1.5; // Harmonic richness
-                
-                const g = audioCtx.createGain();
-                g.gain.value = 0.25; 
-                
-                osc1.connect(g); osc2.connect(g);
-                g.connect(masterGain);
-                
-                osc1.start(); osc2.start();
-                activeOscs[key] = {oscs: [osc1, osc2], gain: g};
+            if (key === 'z') {
+                octaveShift = Math.max(minOctaveShift, octaveShift - 1);
+                return;
+            }
+            if (key === 'x') {
+                octaveShift = Math.min(maxOctaveShift, octaveShift + 1);
+                return;
+            }
+
+            if (noteOffsets[key] !== undefined && !activeOscs[key] && audioCtx) {
+                const usingLid = hasLidData && socketConnected && (Date.now() - lastAngleAt) < 1000;
+                if (!usingLid) {
+                    bellows = 1.0;
+                }
+                const offset = noteOffsets[key] + (octaveShift * 12);
+                const targetFrequency = baseFrequency * Math.pow(2, offset / 12);
+                if (sampleBuffer && !sampleFailed) {
+                    const playbackRate = targetFrequency / baseFrequency;
+                    const source = audioCtx.createBufferSource();
+                    source.buffer = sampleBuffer;
+                    source.playbackRate.value = playbackRate;
+
+                    const g = audioCtx.createGain();
+                    g.gain.value = 0.5;
+
+                    source.connect(g);
+                    g.connect(masterGain);
+
+                    source.start();
+                    activeOscs[key] = { source, gain: g };
+                } else {
+                    const osc1 = audioCtx.createOscillator();
+                    const osc2 = audioCtx.createOscillator();
+                    osc1.type = 'sawtooth';
+                    osc2.type = 'square';
+                    osc1.frequency.value = targetFrequency;
+                    osc2.frequency.value = targetFrequency + 1.5;
+
+                    const g = audioCtx.createGain();
+                    g.gain.value = 0.25;
+
+                    osc1.connect(g);
+                    osc2.connect(g);
+                    g.connect(masterGain);
+
+                    osc1.start();
+                    osc2.start();
+                    activeOscs[key] = { oscs: [osc1, osc2], gain: g };
+                }
                 const el = document.getElementById(`key-${key}`);
-                if(el) el.classList.add('active');
+                if (el) el.classList.add('active');
             }
         };
 
         window.onkeyup = (e) => {
             const key = e.key.toLowerCase();
             if (activeOscs[key]) {
-                activeOscs[key].oscs.forEach(o => o.stop());
+                if (activeOscs[key].source) {
+                    activeOscs[key].source.stop();
+                } else if (activeOscs[key].oscs) {
+                    activeOscs[key].oscs.forEach(o => o.stop());
+                }
                 delete activeOscs[key];
                 const el = document.getElementById(`key-${key}`);
-                if(el) el.classList.remove('active');
+                if (el) el.classList.remove('active');
             }
         };
     </script>
 </body>
+
 </html>

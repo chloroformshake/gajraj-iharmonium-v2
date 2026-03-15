@@ -4,11 +4,12 @@ A web-based harmonium that uses your laptop's lid angle to control the bellows (
 
 ## How It Works
 
-- **Keys**: Press keyboard keys (A, W, S, E, D, F, T, G, Y, H, U, J, K) to play notes
+- **Keys**: Press keyboard keys (A, W, S, E, D, F, T, G, Y, H, U, J, K, O, L, P, ;) to play notes
 - **Bellows**: Close your laptop lid (push down) to pump air and produce sound
 - **Lid Angle Sensor**: Python backend reads your laptop's lid angle in real-time
 - **WebSocket Connection**: Sends lid angle data to the HTML interface
-- **Sound Generation**: Web Audio API creates harmonium-like tones
+- **Sound Generation**: Web Audio API plays a harmonium C3 sample and pitch-shifts for other notes
+- **Octave Shift**: Use Z / X to shift down/up
 
 ## Requirements
 
@@ -17,6 +18,7 @@ A web-based harmonium that uses your laptop's lid angle to control the bellows (
 - `pybooklid` library (for MacBook lid sensor)
 - A web browser (Chrome, Firefox, Safari, etc.)
 - A MacBook with a working lid angle sensor
+- `C3_Sample.mp3` placed in the project root
 
 ## Installation
 
@@ -51,22 +53,24 @@ Bridge active! Waiting for your web app on port 8765...
 Open `harmonium.html` in your web browser:
 
 ```bash
-open harmonium.html
+cd /Users/chloroformshake/Desktop/codeground/m3harm
+python3 -m http.server 8000
 ```
 
-Or simply double-click the `harmonium.html` file.
+Then open `http://localhost:8000/harmonium.html` in your browser.
 
 ### Step 3: Activate Audio
 
 - Click anywhere on the page once to activate audio (browser security requirement)
-- You should see "Audio Active - Ready to play"
+- You should see "Audio Active - Sample Ready"
 
 ### Step 4: Play!
 
-1. **Press and hold** any of these keys: A, W, S, E, D, F, T, G, Y, H, U, J, K
+1. **Press and hold** any of these keys: A, W, S, E, D, F, T, G, Y, H, U, J, K, O, L, P, ;, '
 2. **Push your laptop lid down** (close it partially) to pump air
 3. The bellows meter will fill up as you close the lid
 4. Sound will play based on how much air is in the bellows!
+5. Use **Z / X** to shift the octave down/up
 
 ## Key Mapping
 
@@ -80,6 +84,9 @@ G = G
 H = A
 J = B
 K = C (octave)
+L = D (octave)
+; = E (octave)
+' = F (octave)
 
 Black Keys (Sharps):
 W = C#
@@ -87,6 +94,8 @@ E = D#
 T = F#
 Y = G#
 U = A#
+O = C# (octave)
+P = D# (octave)
 ```
 
 ## Tips
@@ -102,6 +111,7 @@ U = A#
 - Make sure you clicked on the page to activate audio
 - Check that your system volume is up
 - Verify the Python backend is running
+- Make sure you opened the page via `http://localhost:8000` and not directly as a file
 
 **WebSocket connection failed?**
 - Ensure `harmonium.py` is running first
