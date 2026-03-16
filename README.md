@@ -35,9 +35,9 @@ A web-based harmonium that uses your laptop's lid angle to control the bellows (
 
 ## Running the Harmonium
 
-### Step 1: Start the Backend
+### Step 1: Start the Backend (and Web UI)
 
-First, run the Python WebSocket server that reads your laptop's lid angle:
+Run the Python server once. It starts the WebSocket bridge **and** serves the web UI:
 
 ```bash
 python harmonium.py
@@ -47,17 +47,14 @@ You should see:
 ```
 Bridge active! Waiting for your web app on port 8765...
 ```
-
-### Step 2: Open the HTML File
-
-Open `harmonium.html` in your web browser:
-
-```bash
-cd /Users/chloroformshake/Desktop/codeground/m3harm
-python3 -m http.server 8000
+And:
+```
+Serving web UI on http://localhost:8000/harmonium.html
 ```
 
-Then open `http://localhost:8000/harmonium.html` in your browser.
+### Step 2: Open the Web UI
+
+Open `http://localhost:8000/harmonium.html` in your browser.
 
 ### Step 3: Activate Audio
 

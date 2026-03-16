@@ -1,6 +1,9 @@
 import asyncio
-import websockets
 import json
+import threading
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+
+import websockets
 from pybooklid import LidSensor
 
 async def handler(websocket):
@@ -22,6 +25,15 @@ async def main():
 
 if __name__ == "__main__":
     try:
+        httpd = ThreadingHTTPServer(("localhost", 8000), SimpleHTTPRequestHandler)
+        http_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        http_thread.start()
+        print("Serving web UI on http://localhost:8000/harmonium.html")
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\nStopping Bridge...")
+    finally:
+        try:
+            httpd.shutdown()
+        except Exception:
+            pass
